@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+from arex.datasets import TSConfig
 
 
 class Arex(object):
@@ -38,22 +39,22 @@ class Arex(object):
             print(f'Predicting from {self.pred_start} to {self.pred_end}:')
 
         # range of timestamps to predict
-        pred_range = self.X[(self.X.index >= self.pred_start) &
-                            (self.X.index <= self.pred_end)].index
-        
+        pred_range = self.X.loc[self.pred_start:self.pred_end].index
+
         predictions = []
         for timestamp in tqdm(pred_range):
             X_train_start, X_train_end, y_train_start, y_train_end = \
                 self._get_start_end_index(timestamp)
 
+            # print(X_train_start, X_train_end, y_train_start, y_train_end)
             X_train = self.X.iloc[X_train_start:X_train_end]
-            y_train = self.y.iloc[y_train_start:y_train_end]
+            y_train = self.y.iloc[y_train_start:y_train_end, 0]
 
             X_pred_index = self._get_pred_index(timestamp)
             X_pred = self.X.iloc[X_pred_index:X_pred_index + 1]
 
             self.model.fit(X_train, y_train)
-            predictions.append(self.model.predict(X_pred))
+            predictions.append(self.model.predict(X_pred)[0])
 
         pred_df = pd.DataFrame(data={self.pred_name: predictions},
                                index=pred_range)
@@ -73,15 +74,22 @@ class Arex(object):
         assert hasattr(self.model, 'fit') and hasattr(self.model, 'predict'), \
             'model must have fit and predict methods.'
         
+        if self.X and self.y:
+            assert isinstance(self.X, pd.DataFrame), \
+                'X and y must be dataframes'
+            assert isinstance(self.y, pd.DataFrame), \
+                'X and y must be dataframes'
+
         if self.config:
             assert isinstance(self.config, TSConfig), \
                 'data_config must be a TSConfig object'
 
-        assert self.config or (X and y), \
+        assert self.config or (self.X and self.y), \
             'Either pass X and y dataframes or a TSConfig object'
-        if self.config and (X and y):
+        if self.config and (self.X and self.y):
             print('Both X and y and TSConfig were passed, will default to '
                   'TSConfig')
+        
 
     def _validate_predict(self):
         assert self.training in ('expand', 'roll')
@@ -93,20 +101,20 @@ class Arex(object):
         assert self.pred_end in self.X.index
 
     def _get_start_end_index(self, pred_timestamp):
-        
         if pred_timestamp in self.y.index:
             # if target is available at train end
-            X_train_end = np.where(self.X.index == pred_timestamp)[0]
-            y_train_end = np.where(self.y.index == pred_timestamp)[0]
+            X_train_end = np.where(self.X.index == pred_timestamp)[0][0]
+            y_train_end = np.where(self.y.index == pred_timestamp)[0][0]
         else:
             # find most recent available training timestamp
-            last_train_timestamp = max(self.X.index.max(), self.y.index.max())
-            X_train_end = np.where(self.X.index == last_train_timestamp)[0] + 1
-            y_train_end = np.where(self.y.index == last_train_timestamp)[0] + 1
+            last_train_ts = min(self.X.index.max(), self.y.index.max())
+            X_train_end = np.where(self.X.index == last_train_ts)[0][0] + 1
+            y_train_end = np.where(self.y.index == last_train_ts)[0][0] + 1
 
         # find train start based on train parameters
         if self.training == 'expand':
-            X_train_start = 0
+            X_pred_start = np.where(self.X.index == self.pred_start)[0][0]
+            X_train_start = max(0, X_pred_start - self.window)
         else:
             X_train_start = max(0, X_train_end - self.window)
             if X_train_end - self.window < 0:
@@ -114,11 +122,13 @@ class Arex(object):
                       f'out of {self.window} rows needed')
         
         train_start_timestamp = self.X.index[X_train_start]
+
         if train_start_timestamp not in self.y.index:
             raise ValueError(f'No target entry for {train_start_timestamp}')
-        y_train_start = np.where(self.y.index == train_start_timestamp)[0]
+
+        y_train_start = np.where(self.y.index == train_start_timestamp)[0][0]
         return X_train_start, X_train_end, y_train_start, y_train_end
 
     def _get_pred_index(self, pred_timestamp):
-        return np.where(self.X.index == pred_timestamp)[0]
+        return np.where(self.X.index == pred_timestamp)[0][0]
 

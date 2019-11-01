@@ -23,27 +23,27 @@ class CDCLoader(object):
     def __init__(self, filename, ili_version='weighted'):
         self.data = pd.read_csv(filename)
         if ili_version == 'weighted':
-            self.data[self.ILI_RENAME] = self.data[self.ILI_WEIGHTED].copy()
+            self.data[self.ILI_RENAME] = self.data[self.ILI_WEIGHTED]
         elif ili_version == 'unweighted':
-            self.data[self.ILI_RENAME] = self.data[self.ILI_UNWEIGHTED].copy()
+            self.data[self.ILI_RENAME] = self.data[self.ILI_UNWEIGHTED]
 
     def load_national(self):
         data = self.data
         data[TS_VAR] = pd.to_datetime(data[self.DATE_VAR])
-        return data[[TS_VAR, self.ILI_RENAME]]
+        return data[[TS_VAR, self.ILI_RENAME]].copy()
 
     def load_regional(self, region):
         data = self.data
         data[TS_VAR] = pd.to_datetime(data[self.DATE_VAR])
         data[self.REGION_ID] = data[self.REGION_ID].map(lambda x: x[7:])
         data = data[data[self.REGION_ID] == region]
-        return data[[TS_VAR, self.ILI_RENAME]]
+        return data[[TS_VAR, self.ILI_RENAME]].copy()
 
     def load_state(self, state):
         data = self.data
         data[TS_VAR] = pd.to_datetime(data[self.DATE_VAR])
         data = data[data[self.STATE_ID] == state]
-        return data[[TS_VAR, self.ILI_RENAME]]
+        return data[[TS_VAR, self.ILI_RENAME]].copy()
 
 
 class AthenaLoader(object):
@@ -67,8 +67,7 @@ class AthenaLoader(object):
         self.smoothing = smoothing
 
     def load_national(self):
-        data = self.data
-        data = data[data['State'] == 'ALL STATES']
+        data = self.data[self.data['State'] == 'ALL STATES'].copy()
         return self._process_data(data)
 
     def load_regional(self, region):
@@ -80,13 +79,11 @@ class AthenaLoader(object):
                                               as_index=False).sum()
             self.region_data = region_data
             
-        data = self.region_data
-        data = data[data['Region'] == region]
+        data = self.region_data[self.region_data['Region'] == region].copy()
         return self._process_data(data)
 
     def load_state(self, state):
-        data = self.data
-        data = data[data['State'] == state]
+        data = self.data[self.data['State'] == state].copy()
         return self._process_data(data)
 
     def _process_data(self, data):
@@ -95,7 +92,7 @@ class AthenaLoader(object):
         else:
             data[self.ATHENA_VARS] = \
                 data[self.ATHENA_VARS].div(data[self.COUNTS], axis=0)
-        return data[[TS_VAR] + self.ATHENA_VARS]
+        return data[[TS_VAR] + self.ATHENA_VARS].copy()
 
 
 def gt_loader(filename):
