@@ -30,37 +30,53 @@ It is also absolutely possible to use only one of TSConfig or Arex for your purp
 # Examples
 
 Suppose we are modeling flu incidence and our target variable is stored in the dataframe 'cdc'. We wish to use a predictor dataframe 'external'. First register the data:
->>> from forecastlib.datasets import TSConfig
->>> dc = TSConfig()
->>> dc.register_dataset(cdc, name='flu', type='target')
->>> dc.register_dataset(external, name='pred', type='predictor')
+
+```
+from forecastlib.datasets import TSConfig
+dc = TSConfig()
+dc.register_dataset(cdc, name='flu', type='target')
+dc.register_dataset(external, name='pred', type='predictor')
+```
 
 Add lag terms of the target variable as autoregressive predictors:
->>> dc.add_AR(range(1, 7), dataset='flu')
+```
+dc.add_AR(range(1, 7), dataset='flu')
+```
 
 Suppose due to transmission dynamics we also want a lag of a predictor:
->>> dc.add_AR([1], dataset='pred', var_names=['temp'])
+```
+dc.add_AR([1], dataset='pred', var_names=['temp'])
+```
 
 Call the stack method to combine the datasets
->>> dc.stack()
+```
+dc.stack()
+```
 
 The combined dataframes (as an (X, y) tuple) can be accessed using:
->>> dc.data
-
+```
+dc.data
+```
 
 We will use a default sklearn random forest as the model:
->>> from sklearn.ensemble import RandomForestRegressor
->>> mod = RandomForestRegressor()
+```
+from sklearn.ensemble import RandomForestRegressor
+mod = RandomForestRegressor()
+```
 
 The above time series is at a weekly frequency. For nowcasting (predicting target at week t using exogenous data from week t) with
 a year-long rolling training window, do:
->>> arex = Arex(model=mod, data_config=dc)
->>> pred = arex.nowcast(pred_start='2019-02-19', pred_end='2019-08-20',
-                        training='roll', window=52)
+```
+arex = Arex(model=mod, data_config=dc)
+pred = arex.nowcast(pred_start='2019-02-19', pred_end='2019-08-20',
+                    training='roll', window=52)
+```
 
 Suppose we want to predict a week ahead. We would do:
->>> pred2 = arex.forecast(t_plus=1, pred_start='2019-02-19',
-                          pred_end='2019-08-20',
-                          training='roll', window=52)
+```
+pred2 = arex.forecast(t_plus=1, pred_start='2019-02-19',
+                      pred_end='2019-08-20',
+                      training='roll', window=52)
+```
 
 Note that the timestamps for pred_start and pred_end refer to the time of making the prediction, not the time that is predicted.
