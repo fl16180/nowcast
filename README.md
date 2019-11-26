@@ -63,6 +63,7 @@ mod = RandomForestRegressor()
 The above time series is at a weekly frequency. For nowcasting (predicting target at week t using exogenous data from week t) with
 a year-long rolling training window, do:
 ```python
+from forecastlib import Arex
 arex = Arex(model=mod, data_config=dc)
 pred = arex.nowcast(pred_start='2019-02-19', pred_end='2019-08-20',
                     training='roll', window=52)
