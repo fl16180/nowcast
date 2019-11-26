@@ -23,7 +23,7 @@ out-of-the-box time series modeler.
 ## Motivation
 While the logic for time series modeling isn't particularly complicated, there are potential sources of error when one isn't careful. A simple example is using training data that shouldn't be available in forecasting.
 
-Suppose one has annual climate data from the past century and is trying to predict global temperature 5 years ahead. On January 1, 2005 the prediction target is the entire year of 2010. Then for training we can use the X,y pairs from 1999->2004 and earlier, but we cannot use 2000->2005 through 2004->2009. This logic applies to every year's prediction. Otherwise the retrospective forecasts will be unfairly accurate. (Note sometimes 2000->2005 will be available and that can be specified in AREX.)
+Suppose one has annual climate data from the past century and is trying to predict global temperature 5 years ahead. On January 1, 2005 the prediction target is the entire year of 2010. Then for training we can use the X,y pairs from 1999->2004 and earlier, but we cannot use 2000->2005 through 2004->2009. This logic applies to every year's prediction. Otherwise the retrospective forecasts will be unfairly accurate. (Note that in some situations, 2000->2005 will be available. For example, if we make the prediction each December instead of January, the 2005 temperature will be available. This detail can be specified in AREX.forecast using the t_known parameter.)
 
 It is also absolutely possible to use only one of TSConfig or Arex for your purposes. Either readily accepts or returns their underlying pandas dataframes.
 
