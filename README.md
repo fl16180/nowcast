@@ -48,13 +48,9 @@ Suppose due to transmission dynamics we also want a lag of a predictor:
 dc.add_AR([1], dataset='pred', var_names=['temp'])
 ```
 
-Call the stack method to combine the datasets
+Call the stack method to combine the datasets. The combined dataframes (as an (X, y) tuple) can be accessed using the data property.
 ```python
 dc.stack()
-```
-
-The combined dataframes (as an (X, y) tuple) can be accessed using:
-```python
 dc.data
 ```
 
