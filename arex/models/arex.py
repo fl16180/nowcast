@@ -5,6 +5,47 @@ from arex.datasets import TSConfig
 
 
 class Arex(object):
+    """ AREX (AutoRegression with EXogeneity) is an iterative time series
+    predictor that abstracts away the logic of retraining a model sequentially
+    on time series data. AREX does not impose any modeling constraints --
+    instead it is a procedure that can handle any model that is compatible
+    with scikit-learn's fit/predict API.
+
+    Usually, one retrains a time series model at each time step in order to use
+    the most recent information. The training set at each step can be either
+    rolling (fixed size that discards old data), or expanding (use all data).
+    Often, a time series is predicted using a combination of lags of the
+    time series (AR), concurrent exogenous variables (EX), and lags of the
+    exogenous variables. AREX takes care of these details for you.
+
+    On the other hand, the actual model that is applied at each time step is
+    highly important to researchers -- it can involve preprocessing and feature
+    engineering to using various ML algorithms and hyperparameter tuning. Thus
+    this part is flexible and only limited by your creativity. All AREX needs
+    is a model class with fit() and predict() methods, identical to sklearn.
+    In fact, any sklearn model can be passed directly into AREX to get an
+    out-of-the-box time series modeler.
+
+    Example:
+        Suppose we continue the example with TSConfig.
+        >>> dc = TSConfig()
+        >>> dc.register_dataset(cdc, 'CDC', 'target')
+        >>> dc.register_dataset(external, 'pred', 'predictor')
+        >>> dc.add_AR(range(1, 7), dataset='CDC', var_names='%ILI')
+        >>> dc.stack()
+
+        We will use a default sklearn random forest as the model:
+        >>> mod = RandomForestRegressor()
+
+        The above time series is at a weekly frequency. For nowcasting
+        (predicting target at week t using exogenous data from week t) with
+        a year-long rolling training window, do:
+        >>> arex = Arex(model=mod, data_config=dc)
+        >>> pred = arex.nowcast(pred_start='2019-02-19', pred_end='2019-08-20',
+                                training='roll', window=52)
+
+        Suppose we want to predict
+    """
     def __init__(self, model, X=None, y=None, data_config=None, verbose=1):
         self.model = model
         self.X = X

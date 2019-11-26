@@ -29,13 +29,11 @@ class TSConfig(object):
         Suppose we have a target variable in the dataframe 'cdc', and a
         predictor dataset in the dataframe 'external'. First register the
         data:
-
         >>> dc = TSConfig()
         >>> dc.register_dataset(cdc, 'CDC', 'target')
         >>> dc.register_dataset(external, 'pred', 'predictor')
 
         Add lag terms of the target variable as autoregressive predictors:
-
         >>> dc.add_AR(range(1, 7), dataset='CDC', var_names='%ILI')
 
         Call the stack method to combine the datasets

@@ -1,9 +1,10 @@
 import numpy as np
 import pandas as pd
 import pytest
+from pathlib import Path
 
 import sys
-sys.path.append('../')
+sys.path.append(str(Path(__file__).absolute().parent.parent))
 from arex.datasets.data_config import TSConfig, TS_VAR
 from arex import Arex
 
