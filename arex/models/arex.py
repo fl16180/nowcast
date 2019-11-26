@@ -44,7 +44,27 @@ class Arex(object):
         >>> pred = arex.nowcast(pred_start='2019-02-19', pred_end='2019-08-20',
                                 training='roll', window=52)
 
-        Suppose we want to predict
+        Suppose we want to predict a week ahead. We would do:
+        >>> pred2 = arex.forecast(t_plus=1, pred_start='2019-02-19',
+                                  pred_end='2019-08-20',
+                                  training='roll', window=52)
+
+        Note that the timestamps for pred_start and pred_end refer to the time
+        of making the prediction, not the time that is predicted.
+
+    Inputs:
+        model (class): Any model with fit and predict methods following sklearn
+        API. The methods must accept pandas dataframes.
+
+        X (dataframe): Predictor dataframe. Either pass X and y or pass a
+        TSConfig object to data_config.
+
+        y (dataframe): Target dataframe that should consist of a single column.
+
+        data_config (TSConfig): Preprocessed X and y data using TSConfig. This
+        will overwrite X and y if passed.
+
+        verbose (int): Control verbosity of output
     """
     def __init__(self, model, X=None, y=None, data_config=None, verbose=1):
         self.model = model
