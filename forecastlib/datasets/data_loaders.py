@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from .data_config import TS_VAR 
+from forecastlib import TS_VAR
 
 CDC_REGIONS = './Regions.csv'
 MMWR_LOOKUP = './MMWR_lookup.csv'
@@ -78,7 +78,7 @@ class AthenaLoader(object):
             region_data = region_data.groupby(['Region', 'Year', 'MMWR Week'],
                                               as_index=False).sum()
             self.region_data = region_data
-            
+
         data = self.region_data[self.region_data['Region'] == region].copy()
         return self._process_data(data)
 

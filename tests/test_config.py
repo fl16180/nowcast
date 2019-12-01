@@ -4,7 +4,8 @@ from pathlib import Path
 
 import sys
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from arex.datasets.data_config import TSConfig, TS_VAR
+
+from forecastlib import TSConfig, TS_VAR
 
 
 DATES = np.array(['2019-01-01', '2019-01-08', '2019-01-15',

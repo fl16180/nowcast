@@ -15,7 +15,6 @@ def Corr(targets, predictions):
     corr_c = pearsonr(targets, predictions)
     return corr_c[0]
 
-
 def MAE(targets, predictions):
     """ mean absolute error """
     return np.absolute(targets - predictions).mean()

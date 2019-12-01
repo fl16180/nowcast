@@ -5,8 +5,8 @@ from pathlib import Path
 
 import sys
 sys.path.append(str(Path(__file__).absolute().parent.parent))
-from arex.datasets.data_config import TSConfig, TS_VAR
-from arex import Arex
+
+from forecastlib import TSConfig, TS_VAR, Arex
 
 
 class MockModel:
@@ -136,7 +136,29 @@ class TestArexNowcast:
 
 
 class TestArexForecast:
-    def test_simple_forecast(self):
+
+    def test_simple_forecast_one(self):
+        cfg = TSConfig()
+        cfg.register_dataset(TARGET_DF, 'y', 'target')
+        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
+        cfg.stack()
+
+        arex = Arex(model=mm, data_config=cfg)
+        arex.forecast(t_plus=1, pred_start="2019-02-12", pred_end="2019-02-19",
+                      training="roll", window=2, t_known=False)
+        log = arex.get_log()
+        assert to_ymd(log[0]['time']) == '2019-02-12'
+        assert to_ymd(log[1]['time']) == '2019-02-19'
+
+        info = log[0]
+        assert to_ymd(info['X_train'][0]) == '2019-01-22'
+        assert to_ymd(info['X_train'][1]) == '2019-01-29'
+        assert to_ymd(info['y_train'][0]) == '2019-01-29'
+        assert to_ymd(info['y_train'][1]) == '2019-02-05'
+        assert to_ymd(info['X_pred']) == '2019-02-12'
+        assert info['sizes'][0] == (2, 1)
+
+    def test_simple_forecast_two(self):
         cfg = TSConfig()
         cfg.register_dataset(TARGET_DF, 'y', 'target')
         cfg.register_dataset(TRAIN_DF, 'x', 'predictor')

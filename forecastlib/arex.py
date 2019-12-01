@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from arex.datasets import TSConfig
+from forecastlib import TSConfig
 
 
 class Arex(object):
@@ -163,7 +163,7 @@ class Arex(object):
         assert hasattr(self.model, 'fit') and hasattr(self.model, 'predict'), \
             'model must have fit and predict methods.'
 
-        if self.X and self.y:
+        if self.X is not None and self.y is not None:
             assert isinstance(self.X, pd.DataFrame), \
                 'X and y must be dataframes'
             assert isinstance(self.y, pd.DataFrame), \
@@ -173,7 +173,7 @@ class Arex(object):
             assert isinstance(self.config, TSConfig), \
                 'data_config must be a TSConfig object'
 
-        assert self.config or (self.X and self.y), \
+        assert self.config or (self.X is not None and self.y is not None), \
             'Either pass X and y dataframes or a TSConfig object'
         if self.config and (self.X and self.y):
             print('Both X and y and TSConfig were passed, will default to '
