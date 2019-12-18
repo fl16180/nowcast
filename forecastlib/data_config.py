@@ -200,11 +200,11 @@ class TSConfig(object):
 
         # concatenate all lags
         ar_predictors = pd.concat(
-            [start_data.shift(x).add_suffix(f'_lag{x}') for x in terms],
+            [start_data.shift(x).add_suffix('_lag{0}'.format(x)) for x in terms],
             axis=1)
 
         ar_predictors.index.rename(TS_VAR, inplace=True)
-        name = f'AR_{dataset}'
+        name = 'AR_{0}'.format(dataset)
         self.datasets[name] = ar_predictors
         self.predictors.append(name)
 

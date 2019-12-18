@@ -89,6 +89,29 @@ class Arex(object):
 
     def forecast(self, t_plus, pred_start, pred_end,
                 training, window, pred_name='Predicted', t_known=False):
+        """ Performs rolling forecast on data.
+
+        Inputs:
+            t_plus (int): Number of periods ahead to forecast. 0 corresponds to
+                nowcasting (predict y_t from X_t).
+
+            pred_start (str or datetime): Time of first prediction
+
+            pred_end (str or datetime): Time of last prediction
+
+            training (str): Training window behavior, either 'roll' or 'expand'
+
+            window (int): Training window size. If training is 'expand', then
+                window determines the size for the first prediction, and
+                subsequent windows increase in size.
+
+            pred_name (str): Name for prediction output column
+
+            t_known (bool): Whether y_t would be known at time of forecasting.
+                This adjusts the training window to use the most recent
+                information. Since y_t is the nowcast target, t_known must be
+                set to False when t_plus=0.
+        """
         self.t_plus = t_plus
         self.pred_start = pd.to_datetime(pred_start)
         self.pred_end = pd.to_datetime(pred_end)
@@ -101,7 +124,8 @@ class Arex(object):
         self._validate_predict()
 
         if self.verbose > 0:
-            print(f'Predicting from {self.pred_start} to {self.pred_end}:')
+            print('Predicting from {0} to {1}:'.format(self.pred_start,
+                                                       self.pred_end))
 
         # range of timestamps to predict
         pred_range = self.X.loc[self.pred_start:self.pred_end].index
@@ -141,13 +165,16 @@ class Arex(object):
 
     def nowcast(self, pred_start, pred_end,
                 training, window, pred_name='Predicted'):
+        """ Perform rolling nowcast on data. This is just a convenience wrapper
+        for the forecast method.
+        """
         return self.forecast(t_plus=0, pred_start=pred_start,
                              pred_end=pred_end, training=training,
                              window=window, pred_name=pred_name,
                              t_known=False)
 
     def get_params(self):
-        """ Returns user-set parameters of ArEx object """
+        """ Returns user-set parameters of Arex object """
         params = {}
         params['pred_start'] = self.pred_start
         params['pred_end'] = self.pred_end
@@ -157,7 +184,11 @@ class Arex(object):
         return params
 
     def get_log(self):
-        return self.log
+        """ Return a dataframe of metadata for each prediction. For example,
+        the X_train and y_train date ranges, prediction time, and training set
+        sizes. Use this for debugging or to confirm behavior.
+        """
+        return pd.DataFrame(self.log)
 
     def _validate_init(self):
         assert hasattr(self.model, 'fit') and hasattr(self.model, 'predict'), \
@@ -223,8 +254,8 @@ class Arex(object):
 
         if min(X_train_start, y_train_start) < 0:
             raise ValueError(
-                f'Warning: Train set has {min(X_train_end, y_train_end)} out '
-                f'of {self.window} rows needed')
+                'Train set has {0} out of {1} rows needed'.format(
+                    min(X_train_end, y_train_end), self.window))
 
         return X_train_start, X_train_end, y_train_start, y_train_end
 

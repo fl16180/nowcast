@@ -44,7 +44,7 @@ class TestArexNowcast:
         arex = Arex(model=mm, data_config=cfg)
         arex.nowcast(pred_start="2019-02-12", pred_end="2019-02-19",
                     training="roll", window=2)
-        log = arex.get_log()
+        log = arex.log
         assert to_ymd(log[0]['time']) == '2019-02-12'
         assert to_ymd(log[1]['time']) == '2019-02-19'
 
@@ -66,7 +66,7 @@ class TestArexNowcast:
         arex = Arex(model=mm, data_config=cfg)
         arex.nowcast(pred_start="2019-02-19", pred_end="2019-02-26",
                     training="roll", window=2)
-        log = arex.get_log()
+        log = arex.log
         assert to_ymd(log[0]['time']) == '2019-02-19'
         assert to_ymd(log[1]['time']) == '2019-02-26'
 
@@ -88,7 +88,7 @@ class TestArexNowcast:
         arex = Arex(model=mm, data_config=cfg)
         arex.nowcast(pred_start="2019-02-19", pred_end="2019-03-05",
                     training="roll", window=2)
-        log = arex.get_log()
+        log = arex.log
         assert to_ymd(log[0]['time']) == '2019-02-19'
         assert to_ymd(log[1]['time']) == '2019-02-26'
 
@@ -130,7 +130,7 @@ class TestArexNowcast:
 
         arex.nowcast(pred_start="2019-02-19", pred_end="2019-03-05",
             training="expand", window=7)
-        log = arex.get_log()
+        log = arex.log
 
         assert to_ymd(log[0]['X_train'][0]) == '2019-01-01'
 
@@ -146,7 +146,7 @@ class TestArexForecast:
         arex = Arex(model=mm, data_config=cfg)
         arex.forecast(t_plus=1, pred_start="2019-02-12", pred_end="2019-02-19",
                       training="roll", window=2, t_known=False)
-        log = arex.get_log()
+        log = arex.log
         assert to_ymd(log[0]['time']) == '2019-02-12'
         assert to_ymd(log[1]['time']) == '2019-02-19'
 
@@ -167,7 +167,7 @@ class TestArexForecast:
         arex = Arex(model=mm, data_config=cfg)
         arex.forecast(t_plus=2, pred_start="2019-02-12", pred_end="2019-02-19",
                       training="roll", window=2, t_known=False)
-        log = arex.get_log()
+        log = arex.log
         assert to_ymd(log[0]['time']) == '2019-02-12'
         assert to_ymd(log[1]['time']) == '2019-02-19'
 
@@ -188,7 +188,7 @@ class TestArexForecast:
         arex = Arex(model=mm, data_config=cfg)
         arex.forecast(t_plus=2, pred_start="2019-02-12", pred_end="2019-02-19",
                       training="roll", window=2, t_known=True)
-        log = arex.get_log()
+        log = arex.log
         assert to_ymd(log[0]['time']) == '2019-02-12'
         assert to_ymd(log[1]['time']) == '2019-02-19'
 
@@ -209,7 +209,7 @@ class TestArexForecast:
         arex = Arex(model=mm, data_config=cfg)
         arex.forecast(t_plus=2, pred_start="2019-02-12", pred_end="2019-02-19",
                       training="expand", window=2, t_known=False)
-        log = arex.get_log()
+        log = arex.log
         assert to_ymd(log[0]['time']) == '2019-02-12'
         assert to_ymd(log[1]['time']) == '2019-02-19'
 
@@ -238,7 +238,7 @@ class TestArexForecast:
         arex = Arex(model=mm, data_config=cfg)
         arex.forecast(t_plus=2, pred_start="2019-02-12", pred_end="2019-02-19",
                       training="expand", window=2, t_known=True)
-        log = arex.get_log()
+        log = arex.log
         assert to_ymd(log[0]['time']) == '2019-02-12'
         assert to_ymd(log[1]['time']) == '2019-02-19'
 
@@ -269,7 +269,7 @@ class TestArexForecast:
         arex = Arex(model=mm, data_config=cfg)
         arex.forecast(t_plus=2, pred_start="2019-02-26", pred_end="2019-03-05",
                       training="roll", window=2, t_known=False)
-        log = arex.get_log()
+        log = arex.log
 
         assert to_ymd(log[0]['time']) == '2019-02-26'
         assert to_ymd(log[1]['time']) == '2019-03-05'
