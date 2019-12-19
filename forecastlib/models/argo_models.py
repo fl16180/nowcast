@@ -7,7 +7,7 @@ from scipy.special import logit, expit
 
 
 class Argo(object):
-    """ The base ARGO model without extra features """
+    """ The base ARGO model without extra features, with Lasso regression """
     def __init__(self):
         self.model = LassoCV(eps=0.001, n_alphas=200, cv=10,
                              max_iter=1e4, n_jobs=-1)
@@ -23,7 +23,11 @@ class Argo(object):
 
 
 class Argo2015(object):
-    """ The base ARGO model without extra features """
+    """ The ARGO model based on Yang et al. 2015
+
+        Currently not configured to transform Google Trends data.
+        It takes the logit of all inputs.
+    """
     def __init__(self):
         self.model = LassoCV(eps=0.001, n_alphas=200, cv=10,
                              max_iter=1e4, n_jobs=-1)
@@ -31,10 +35,15 @@ class Argo2015(object):
 
         self.logit = lambda x: logit(x)
         self.expit = lambda x: expit(x)
+        self.log = lambda x: np.log(x)
 
     def fit(self, X, y):
-        Xl = self.logit(X / 100)
-        yl = self.logit(y / 100)
+        # ar_cols = [x for x in X.columns if 'AR_' in x]
+        # X_ar = X[ar_cols].copy()
+        # X[ar_cols] = self.logit(X_ar / 100)
+
+        Xl = logit(X / 100)
+        yl = logit(y / 100)
         X_train = self.scaler.fit_transform(Xl)
         self.model.fit(X_train, yl)
 
@@ -45,6 +54,7 @@ class Argo2015(object):
 
 
 class ArgoSVM(object):
+    """ ARGO with SVM regressor, based on Santillana et al. 2016 """
     def __init__(self):
         import warnings
         warnings.filterwarnings("ignore")

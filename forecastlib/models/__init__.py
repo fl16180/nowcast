@@ -1,1 +1,1 @@
-from argo_models import *
+from .argo_models import *

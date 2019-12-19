@@ -160,7 +160,7 @@ class Arex(object):
             predictions.append(self.model.predict(X_pred)[0])
 
         pred_df = pd.DataFrame(data={self.pred_name: predictions},
-                               index=pred_range)
+                               index=pred_range).reset_index()
         return pred_df
 
     def nowcast(self, pred_start, pred_end,
