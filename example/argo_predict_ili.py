@@ -5,9 +5,9 @@ import sys
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 
 import pandas as pd
+from nowcast import TSConfig, Arex
 from nowcast.datasets import CDCLoader, gt_loader
 from nowcast.models import Argo
-from nowcast import TSConfig, Arex
 from nowcast.utils.metrics import RMSE, Corr
 
 

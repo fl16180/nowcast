@@ -29,7 +29,7 @@ It is also absolutely possible to use only one of `TSConfig` or `AREX` for your 
 Suppose we are modeling flu incidence and our target variable is stored in the dataframe `cdc`. We wish to use a predictor dataframe `external`. First register the data:
 
 ```python
-from nowcast.datasets import TSConfig
+from nowcast import TSConfig
 dc = TSConfig()
 dc.register_dataset(cdc, name='flu', type='target')
 dc.register_dataset(external, name='pred', type='predictor')
