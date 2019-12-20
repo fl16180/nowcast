@@ -1,8 +1,8 @@
 """ Example: Nowcast weekly flu incidence in the state of Massachusetts """
 
 from pathlib import Path
-import sys
-sys.path.append(str(Path(__file__).absolute().parent.parent))
+# import sys
+# sys.path.append(str(Path(__file__).absolute().parent.parent))
 
 import pandas as pd
 from nowcast import TSConfig, Arex

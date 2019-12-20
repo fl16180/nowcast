@@ -1,4 +1,6 @@
 # Overview
+**TL;DR** `nowcast` iterates fitting sklearn (or analogous) models on time series data, with additional convenient features such as lag terms, date matching, and simulated information delays.
+
 Nowcasting refers to predicting in the present, short-term future, or recent past. Over the years I've had to rewrite a lot of code for machine learning on time series. The basic idea is that at each prediction time, the model needs to be retrained on the most recent data available at that time. While this isn't particularly complex to perform, it can be tedious and error-prone, especially when it comes to forecasting into the future. Because of this, the aim of `nowcast` is to abstract this procedure by providing a *light*, *modular* framework for dynamic time series modeling, compatible with scikit-learn. `nowcast` has two main components that are interlinked.
 
 ## TSConfig
@@ -76,9 +78,12 @@ pred2 = arex.forecast(t_plus=1, pred_start='2019-02-19',
 Note that the timestamps for `pred_start` and `pred_end` refer to the time of making the prediction, not the time that is predicted.
 
 # Installation
-I will make this package available on pypi very soon (for now clone the repo). It is recommended to use Python 3.6+.
+Install from PyPI using:
+```
+pip install nowcast
+```
 
-Run `pytest` from the package root directory to check that the tests pass.
+It is recommended to use Python 3.6+. You can run `pytest` from the package root directory to check that the tests pass.
 
 # Additional tools
 Also included are some additional functions for working with CDC flu data. This was my original use case for `nowcast`. The package can be used to replicate the models of many papers, including: <https://www.pnas.org/content/112/47/14473> and <https://www.nature.com/articles/s41467-018-08082-0>
