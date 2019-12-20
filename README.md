@@ -42,9 +42,9 @@ Add lag terms of the target variable as autoregressive predictors:
 dc.add_AR(range(1, 7), dataset='flu')
 ```
 
-Suppose due to transmission dynamics we also want a lag of a predictor:
+Suppose due to transmission dynamics we also want a lag of a predictor within the pred dataset:
 ```python
-dc.add_AR([1], dataset='pred', var_names=['temp'])
+dc.add_AR([1], dataset='pred', var_names=['temperature'])
 ```
 
 Call the `stack` method to combine the datasets. The combined dataframes (as an `(X, y)` tuple) can be accessed using the data property.
