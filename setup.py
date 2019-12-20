@@ -2,10 +2,10 @@ import setuptools
 
 VERSION = '0.1'
 SHORT_DESCRIPTION = 'Light, modular framework for dynamic time series modeling'
-URL = 'https://github.com/fl16180/forecastlib'
+URL = 'https://github.com/fl16180/nowcast'
 
-setup(
-    name='forecastlib',
+setuptools.setup(
+    name='nowcast',
     version=VERSION,
     author='Fred Lu',
     author_email='fredlu.flac@gmail.com',

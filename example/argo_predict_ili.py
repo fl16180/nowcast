@@ -5,10 +5,10 @@ import sys
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 
 import pandas as pd
-from forecastlib.datasets import CDCLoader, gt_loader
-from forecastlib.models import Argo
-from forecastlib import TSConfig, Arex
-from forecastlib.utils.metrics import RMSE, Corr
+from nowcast.datasets import CDCLoader, gt_loader
+from nowcast.models import Argo
+from nowcast import TSConfig, Arex
+from nowcast.utils.metrics import RMSE, Corr
 
 
 # load data

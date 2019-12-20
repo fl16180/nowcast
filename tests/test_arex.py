@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 sys.path.append(str(Path(__file__).absolute().parent.parent))
 
-from forecastlib import TSConfig, TS_VAR, Arex
+from nowcast import TSConfig, TS_VAR, Arex
 
 
 class MockModel:
