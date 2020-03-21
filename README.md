@@ -1,7 +1,7 @@
 ## Overview
 **TL;DR** `nowcast` iterates fitting sklearn (or analogous) models on time series data, with additional convenient features such as lag terms, date matching, and simulated information delays. Check out https://nowcast.readthedocs.io/en/latest/ for API usage and documentation!
 
-Nowcasting refers to predicting in the present, short-term future, or recent past. Over the years I've had to rewrite a lot of code for machine learning on time series. The basic idea is that at each prediction time, the model needs to be retrained on the most recent data available at that time. While this isn't particularly complex to perform, it can be tedious and error-prone, especially when it comes to forecasting into the future. Because of this, the aim of `nowcast` is to abstract this procedure by providing a *light*, *modular* framework for dynamic time series modeling, compatible with scikit-learn. `nowcast` has two main components that are interlinked.
+Nowcasting refers to predicting in the present, short-term future, or recent past. Over the years I've re-implemented code for machine learning on time series multiple times. The basic idea is that at each prediction time, the model needs to be retrained on the most recent data available at that time. While this isn't particularly complex to perform, it can be tedious and error-prone, especially when it comes to forecasting into the future. Wouldn't it be nice to abstract this procedure away? Because of this, `nowcast` provides a *light*, *modular* framework for dynamic time series modeling, compatible with scikit-learn. `nowcast` has two main components that are interlinked.
 
 ## Installation
 Install from PyPI using:
