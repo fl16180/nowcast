@@ -5,9 +5,9 @@ from nowcast import TSConfig
 
 
 class Arex(object):
-    """ AREX (AutoRegression with EXogeneity) is an iterative time series
+    """ ``AREX`` (AutoRegression with EXogeneity) is an iterative time series
     predictor that abstracts away the logic of retraining a model sequentially
-    on time series data. AREX does not impose any modeling constraints --
+    on time series data. ``AREX`` does not impose any modeling constraints --
     instead it is a procedure that can handle any model that is compatible
     with scikit-learn's fit/predict API.
 
@@ -16,53 +16,62 @@ class Arex(object):
     rolling (fixed size that discards old data), or expanding (use all data).
     Often, a time series is predicted using a combination of lags of the
     time series (AR), concurrent exogenous variables (EX), and lags of the
-    exogenous variables. AREX takes care of these details for you.
+    exogenous variables. ``AREX`` takes care of these details for you.
 
     On the other hand, the actual model that is applied at each time step is
     highly important to researchers -- it can involve preprocessing and feature
     engineering to using various ML algorithms and hyperparameter tuning. Thus
     this part is flexible and only limited by your creativity. All AREX needs
-    is a model class with fit() and predict() methods, identical to sklearn.
-    In fact, any sklearn model can be passed directly into AREX to get an
+    is a model class with ``fit()`` and ``predict()`` methods, identical to
+    sklearn.
+
+    In fact, any sklearn model can be passed directly into ``AREX`` to get an
     out-of-the-box time series modeler.
 
     Example:
-        Suppose we continue the example with TSConfig.
-        >>> dc = TSConfig()
-        >>> dc.register_dataset(cdc, 'CDC', 'target')
-        >>> dc.register_dataset(external, 'pred', 'predictor')
-        >>> dc.add_AR(range(1, 7), dataset='CDC', var_names='%ILI')
-        >>> dc.stack()
+        Suppose we continue the example with ``TSConfig``::
 
-        We will use a default sklearn random forest as the model:
-        >>> mod = RandomForestRegressor()
+            $ dc = TSConfig()
+            $ dc.register_dataset(cdc, 'CDC', 'target')
+            $ dc.register_dataset(external, 'pred', 'predictor')
+            $ dc.add_AR(range(1, 7), dataset='CDC', var_names='%ILI')
+            $ dc.stack()
+
+        We will use a default sklearn random forest as the model::
+            $ mod = RandomForestRegressor()
 
         The above time series is at a weekly frequency. For nowcasting
         (predicting target at week t using exogenous data from week t) with
-        a year-long rolling training window, do:
-        >>> arex = Arex(model=mod, data_config=dc)
-        >>> pred = arex.nowcast(pred_start='2019-02-19', pred_end='2019-08-20',
-                                training='roll', window=52)
+        a year-long rolling training window, do::
 
-        Suppose we want to predict a week ahead. We would do:
-        >>> pred2 = arex.forecast(t_plus=1, pred_start='2019-02-19',
+            $ arex = Arex(model=mod, data_config=dc)
+            $ pred = arex.nowcast(pred_start='2019-02-19',
                                   pred_end='2019-08-20',
                                   training='roll', window=52)
+
+        Suppose we want to predict a week ahead. We would run::
+
+            $ pred2 = arex.forecast(t_plus=1, pred_start='2019-02-19',
+                                    pred_end='2019-08-20',
+                                    training='roll', window=52)
 
         Note that the timestamps for pred_start and pred_end refer to the time
         of making the prediction, not the time that is predicted.
 
-    Inputs:
-        model (class): Any model with fit and predict methods following sklearn
-        API. The methods must accept pandas dataframes.
+    Args:
+        model (class): Any model with ``fit`` and ``predict`` methods following
+            sklearn API. The methods must accept pandas dataframes.
 
-        X (dataframe): Predictor dataframe. Either pass X and y or pass a
-        TSConfig object to data_config.
+        X (dataframe): Predictor dataframe. Either pass dataframes for both
+            ``X`` and ``y``, or otherwise pass a TSConfig object to
+            data_config.
 
-        y (dataframe): Target dataframe that should consist of a single column.
+        y (dataframe): Target dataframe with a single column with the target
+            measurements, indexed by timestamp
 
-        data_config (TSConfig): Preprocessed X and y data using TSConfig. This
-        will overwrite X and y if passed.
+        data_config (TSConfig): TSConfig object containing preprocessed
+            ``X`` and ``y`` data using TSConfig.
+            This will overwrite ``X`` and ``y`` if passed.
 
         verbose (int): Control verbosity of output
     """
@@ -89,11 +98,11 @@ class Arex(object):
 
     def forecast(self, t_plus, pred_start, pred_end,
                 training, window, pred_name='Predicted', t_known=False):
-        """ Performs rolling forecast on data.
+        """ Perform rolling forecast on data.
 
-        Inputs:
+        Args:
             t_plus (int): Number of periods ahead to forecast. 0 corresponds to
-                nowcasting (predict y_t from X_t).
+                nowcasting (predict ``y_t`` from ``X_t``).
 
             pred_start (str or datetime): Time of first prediction
 
@@ -107,10 +116,10 @@ class Arex(object):
 
             pred_name (str): Name for prediction output column
 
-            t_known (bool): Whether y_t would be known at time of forecasting.
-                This adjusts the training window to use the most recent
-                information. Since y_t is the nowcast target, t_known must be
-                set to False when t_plus=0.
+            t_known (bool): Whether ``y_t`` would be known at time of
+                forecasting. This adjusts the training window to use the most
+                recent information. Since ``y_t`` is the nowcast target,
+                ``t_known`` must be set to False when ``t_plus=0``.
         """
         self.t_plus = t_plus
         self.pred_start = pd.to_datetime(pred_start)
@@ -174,7 +183,7 @@ class Arex(object):
                              t_known=False)
 
     def get_params(self):
-        """ Returns user-set parameters of Arex object """
+        """ Returns user-set parameters of ``Arex`` object """
         params = {}
         params['pred_start'] = self.pred_start
         params['pred_end'] = self.pred_end
@@ -185,8 +194,8 @@ class Arex(object):
 
     def get_log(self):
         """ Return a dataframe of metadata for each prediction. For example,
-        the X_train and y_train date ranges, prediction time, and training set
-        sizes. Use this for debugging or to confirm behavior.
+        the ``X_train`` and ``y_train`` date ranges, prediction time, and
+        training set sizes. Use this for debugging or to confirm behavior.
         """
         return pd.DataFrame(self.log)
 

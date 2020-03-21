@@ -1,3 +1,14 @@
+""" Examples of ARGO models corresponding to previous research:
+
+These examples can be used out-of-the-box as an alternative to standard sklearn
+models. They demonstrate the variety of options that can be defined in an
+iterated time series model, including data preprocessing, transformations, and
+cross-validation.
+
+Models should adhere to sklearn API as shown in the examples.
+
+"""
+
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LassoCV
@@ -25,7 +36,7 @@ class Argo(object):
 class Argo2015(object):
     """ The ARGO model based on Yang et al. 2015
 
-        Currently not configured to transform Google Trends data.
+        Currently not configured to log-transform Google Trends data.
         It takes the logit of all inputs.
     """
     def __init__(self):
@@ -35,7 +46,7 @@ class Argo2015(object):
 
         self.logit = lambda x: logit(x)
         self.expit = lambda x: expit(x)
-        self.log = lambda x: np.log(x)
+        # self.log = lambda x: np.log(x)
 
     def fit(self, X, y):
         # ar_cols = [x for x in X.columns if 'AR_' in x]

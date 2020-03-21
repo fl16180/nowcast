@@ -10,37 +10,45 @@ class TSConfig(object):
 
     This simplifies the process of combining datasets from different domains.
     The data is unified into a single configuration object which is then
-    handled directly by time series models. The main features include:
+    handled directly by time series models.
 
-        1. Register each dataset so that TSConfig can automatically merge
-            on timestamp. Arbitrary combinations of datasets/variables can
-            be specified for modeling.
-        2. Conveniently add autoregressive (lag) terms for any variable from
-            any dataset, with extension to the future as far as the data goes.
-            Unlike the default pandas lag function which truncates the data at
-            the last date, this allows prediction on the future
-            (i.e. forecasting).
-        3. Simulate information lag at the variable level.
-            In other words, rows can be shifted so that the prediction for each
-            timestamp uses only what information would have been available at
-            the forecast time.
+    Main features:
+        - Register each dataset so that TSConfig can automatically merge on
+          timestamp. Arbitrary combinations of datasets/variables can be
+          specified for modeling.
+
+        - Conveniently add autoregressive (lag) terms for any variable from
+          any dataset, with extension to the future as far as the data goes.
+          Unlike the default pandas lag function which truncates the data at
+          the last date, this allows prediction on the future
+          (i.e. forecasting).
+
+        - Simulate information lag at the variable level.
+          In other words, rows can be shifted so that the prediction for each
+          timestamp uses only what information would have been available at
+          the forecast time.
 
     Example:
-        Suppose we have a target variable in the dataframe 'cdc', and a
-        predictor dataset in the dataframe 'external'. First register the
-        data:
-        >>> dc = TSConfig()
-        >>> dc.register_dataset(cdc, 'CDC', 'target')
-        >>> dc.register_dataset(external, 'pred', 'predictor')
+        Suppose we have a target variable in the dataframe ``cdc``, and a
+        predictor dataset in the dataframe ``external``. First register the
+        data::
 
-        Add lag terms of the target variable as autoregressive predictors:
-        >>> dc.add_AR(range(1, 7), dataset='CDC', var_names='%ILI')
+            $ dc = TSConfig()
+            $ dc.register_dataset(cdc, 'CDC', 'target')
+            $ dc.register_dataset(external, 'pred', 'predictor')
 
-        Call the stack method to combine the datasets
-        >>> dc.stack()
+        Add lag terms of the target variable as autoregressive predictors::
 
-        Combined dataframes (as an (X, y) tuple) can then be accessed using:
-        >>> dc.data
+            $ dc.add_AR(range(1, 7), dataset='CDC', var_names='%ILI')
+
+        Call the stack method to combine the datasets::
+
+            $ dc.stack()
+
+        This enables combined dataframes (as ``(X, y)`` tuple) to be accessed::
+
+            $ dc.data
+
     """
     def __init__(self):
         self.datasets = {}
@@ -53,7 +61,7 @@ class TSConfig(object):
     def register_dataset(self, data, name, type, var_names=None, copy=True):
         """ Register a dataset with the TSConfig.
 
-        Inputs:
+        Args:
             data (pd.DataFrame): Must contain at least 2 columns, a timestamp
                 column (called 'Timestamp'), and a variable column.
 
@@ -132,18 +140,21 @@ class TSConfig(object):
         """ Specify information delays by dataset.
 
         This simulates delays in receiving a data source. Here, one can
-        specify which datasets are delayed. Caution: Make sure whether AR lags
-        based on the target variable should be delayed based on the situation.
-        Setting datasets='all' will delay these lags as well, which may not
-        be realistic for knowledge delays. This setting is similar to
-        forecasting with an important difference: The training set will run up
-        to the present, whereas in forecasting the training set is limited to
-        the most recent available target value.
+        specify which datasets are delayed.
 
-        Because of the interaction with the delays and AR terms, set_delay
-        methods must be called before add_AR.
+        Caution:
+            Make sure whether AR lags based on the target variable should be
+            delayed based on the situation. Setting datasets='all' will delay
+            these lags as well, which may not be realistic for knowledge
+            delays. This setting is similar to forecasting with an important
+            difference: The training set will run up to the present, whereas
+            in forecasting the training set is limited to the most recent
+            available target value.
 
-        Inputs:
+        Because of the interaction with the delays and AR terms, ``set_delay``
+        methods must be called before ``add_AR``.
+
+        Args:
             periods (int): number of time intervals of delay
 
             datasets (str or list): list of datasets to apply delay or 'all'
@@ -168,10 +179,11 @@ class TSConfig(object):
             self.datasets[ds] = shifted_df
 
     def add_AR(self, terms, dataset, var_names='all'):
-        """ Creates an autoregressive (lagged) dataset as additional features.
-        These are stored using the name 'AR_dataset'.
+        """ Create an autoregressive (lagged) dataset as additional features.
 
-        Inputs:
+        These are stored using the name 'AR_{dataset}'.
+
+        Args:
             terms (list): lag terms to consider, e.g. 1 means 1 period ago.
 
             dataset (str): Dataset containing the variables to be lagged
@@ -209,14 +221,14 @@ class TSConfig(object):
         self.predictors.append(name)
 
     def stack(self, predictors='all', merge_type='outer', fill_na='ignore'):
-        """ Merge datasets together into final modeling dataframe
+        """ Merge datasets together into final modeling dataframe.
 
-        Inputs:
+        Args:
             predictors ('all' or list): All predictor datasets to use
 
             merge_type (str): pandas merge option. In general use 'outer'.
 
-            fill_na (str): How to handle missing data.
+            fill_na (str): How to handle missing data. Keep as 'ignore' for now
         """
         if predictors == 'all':
             dfs = [self.datasets[x] for x in self.predictors]

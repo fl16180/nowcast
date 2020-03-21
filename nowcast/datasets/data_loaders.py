@@ -1,3 +1,9 @@
+"""Data loaders for various datasets used by ARGO:
+
+Specifically: CDC ILINet data, athenahealth, and Google Trends
+
+"""
+
 import numpy as np
 import pandas as pd
 from nowcast import TS_VAR
@@ -9,9 +15,11 @@ MMWR_LOOKUP = './MMWR_lookup.csv'
 class CDCLoader(object):
     """ Loader for CDC data.
 
-    Example usage:
-        >>> cdcl = CDCLoader("./ILI_national_dated.csv")
-        >>> cdc = cdcl.load_national()
+    Example usage::
+
+        $ cdcl = CDCLoader("./ILI_national_dated.csv")
+        $ cdc = cdcl.load_national()
+
     """
     DATE_VAR = 'Date'
     ILI_WEIGHTED = '% WEIGHTED ILI'
@@ -49,9 +57,11 @@ class CDCLoader(object):
 class AthenaLoader(object):
     """ Loader for CDC data.
 
-    Example usage:
-        >>> athl = AthenaLoader("./ATHdata.csv")
-        >>> ath = athl.load_national()
+    Example usage::
+
+        $ athl = AthenaLoader("./ATHdata.csv")
+        $ ath = athl.load_national()
+
     """
     DATE_VAR = 'Week Start Date'
     ATHENA_VARS = ['Flu Visit Count', 'ILI Visit Count',
