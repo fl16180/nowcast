@@ -1,11 +1,9 @@
-# Overview
+## Overview
 **TL;DR** `nowcast` iterates fitting sklearn (or analogous) models on time series data, with additional convenient features such as lag terms, date matching, and simulated information delays. Check out https://nowcast.readthedocs.io/en/latest/ for API usage and documentation!
 
 Nowcasting refers to predicting in the present, short-term future, or recent past. Over the years I've had to rewrite a lot of code for machine learning on time series. The basic idea is that at each prediction time, the model needs to be retrained on the most recent data available at that time. While this isn't particularly complex to perform, it can be tedious and error-prone, especially when it comes to forecasting into the future. Because of this, the aim of `nowcast` is to abstract this procedure by providing a *light*, *modular* framework for dynamic time series modeling, compatible with scikit-learn. `nowcast` has two main components that are interlinked.
 
-
-
-# Installation
+## Installation
 Install from PyPI using:
 ```
 pip install nowcast
@@ -13,7 +11,8 @@ pip install nowcast
 
 It is recommended to use Python 3.6+. You can run `pytest` from the package root directory to check that the tests pass.
 
-## TSConfig
+## How does `nowcast` work?
+### TSConfig
 The first part, `TSConfig`, takes as input any number of time series data, and merges them into modeling dataframes. There are two features that make this especially useful:
 
 1. Conveniently add autoregressive (lag) terms for any variable, such as the target or any exogenous variable. Adding lag features can significantly improve predictive performance.
@@ -21,7 +20,7 @@ The first part, `TSConfig`, takes as input any number of time series data, and m
 
 `TSConfig` simplifies the process of combining datasets from different domains. The data is unified into a single configuration object which is then handled directly by time series models.
 
-## AREX
+### AREX
 The second component is `AREX` (AutoRegression with EXogeneity). `AREX` is an iterative time series predictor that abstracts away the logic of retraining a model sequentially on time series data. `AREX` does not impose any modeling constraints -- instead it is a procedure that can handle any model that is compatible with scikit-learn's fit/predict API.
 
 Usually, one retrains a time series model at each time step in order to use the most recent information. The training set at each step can be either rolling (fixed size that discards old data), or expanding (use all data). Often, a time series is predicted using a combination of lags of the time series (AR), concurrent exogenous variables (EX), and lags of the exogenous variables. `AREX` takes care of these details for you.
@@ -36,7 +35,7 @@ Suppose one has annual climate data from the past century and is trying to predi
 
 It is also absolutely possible to use only one of `TSConfig` or `AREX` for your purposes. Either readily accepts or returns their underlying pandas dataframes.
 
-# Examples
+## Examples
 
 Suppose we are modeling flu incidence and our target variable is stored in the dataframe `cdc`. We wish to use a predictor dataframe `external`. First register the data:
 
@@ -89,7 +88,7 @@ Note that the timestamps for `pred_start` and `pred_end` refer to the time of ma
 
 For more instructions, please check out the docstrings in nowcast/arex.py and nowcast/data_config.py
 
-# Additional tools
+## Additional tools
 Also included are some additional functions for working with CDC flu data. This was my original use case for `nowcast`. The package can be used to replicate the models of many papers, including: <https://www.pnas.org/content/112/47/14473> and <https://www.nature.com/articles/s41467-018-08082-0>
 
 Refer to the examples directory for a functional script with example data.
