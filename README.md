@@ -3,6 +3,8 @@
 
 Nowcasting refers to predicting in the present, short-term future, or recent past. Over the years I've had to rewrite a lot of code for machine learning on time series. The basic idea is that at each prediction time, the model needs to be retrained on the most recent data available at that time. While this isn't particularly complex to perform, it can be tedious and error-prone, especially when it comes to forecasting into the future. Because of this, the aim of `nowcast` is to abstract this procedure by providing a *light*, *modular* framework for dynamic time series modeling, compatible with scikit-learn. `nowcast` has two main components that are interlinked.
 
+Check out https://nowcast.readthedocs.io/en/latest/ for API usage and documentation!
+
 ## TSConfig
 The first part, `TSConfig`, takes as input any number of time series data, and merges them into modeling dataframes. There are two features that make this especially useful:
 
