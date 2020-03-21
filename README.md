@@ -77,6 +77,8 @@ pred2 = arex.forecast(t_plus=1, pred_start='2019-02-19',
 
 Note that the timestamps for `pred_start` and `pred_end` refer to the time of making the prediction, not the time that is predicted.
 
+For more instructions, please check out the docstrings in nowcast/arex.py and nowcast/data_config.py
+
 # Installation
 Install from PyPI using:
 ```
