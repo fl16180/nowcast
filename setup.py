@@ -1,6 +1,6 @@
 import setuptools
 
-VERSION = '0.1.2'
+VERSION = '0.2.0'
 SHORT_DESCRIPTION = 'Light, modular framework for dynamic time series modeling'
 URL = 'https://github.com/fl16180/nowcast'
 
@@ -8,7 +8,7 @@ setuptools.setup(
     name='nowcast',
     version=VERSION,
     author='Fred Lu',
-    author_email='fredlu.flac@gmail.com',
+    author_email='fredlu1618@gmail.com',
     description=SHORT_DESCRIPTION,
     long_description='See GitHub for description',
     url=URL,
