@@ -42,13 +42,13 @@ Suppose we are modeling flu incidence and our target variable is stored in the d
 ```python
 from nowcast import TSConfig
 dc = TSConfig()
-dc.register_dataset(cdc, name='flu', type='target')
-dc.register_dataset(external, name='pred', type='predictor')
+dc.register_target(cdc, time_var='Timestamp', target_var='CDC')
+dc.register_dataset(external, name='pred', time_var='Timestamp')
 ```
 
 Add lag terms of the target variable as autoregressive predictors:
 ```python
-dc.add_AR(range(1, 7), dataset='flu')
+dc.add_AR(range(1, 7), dataset='target')
 ```
 
 Suppose due to transmission dynamics we also want a lag of a predictor within the pred dataset:

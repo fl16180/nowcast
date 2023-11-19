@@ -27,13 +27,21 @@ class TestTSConfig:
 
     def test_registration(self):
         cfg = TSConfig()
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
+        cfg.register_dataset(TRAIN_DF, 'predictor', 'Timestamp', 'x')
+        cfg.register_target(TARGET_DF, 'Timestamp', 'y')
 
-        assert cfg.target == 'y'
-        assert 'x' in cfg.datasets.keys() and 'y' in cfg.datasets.keys()
-        pd.testing.assert_frame_equal(cfg.datasets['x'], CFG_X_DF)
-        pd.testing.assert_frame_equal(cfg.datasets['y'], CFG_Y_DF)
+        assert 'predictor' in cfg.datasets.keys() and 'target' in cfg.datasets.keys()
+        pd.testing.assert_frame_equal(cfg.datasets['predictor'], CFG_X_DF)
+        pd.testing.assert_frame_equal(cfg.datasets['target'], CFG_Y_DF)
+
+    def test_registration_unspecified(self):
+        cfg = TSConfig()
+        cfg.register_dataset(TRAIN_DF, 'predictor', 'Timestamp')
+        cfg.register_target(TARGET_DF, 'Timestamp')
+
+        assert 'predictor' in cfg.datasets.keys() and 'target' in cfg.datasets.keys()
+        pd.testing.assert_frame_equal(cfg.datasets['predictor'], CFG_X_DF)
+        pd.testing.assert_frame_equal(cfg.datasets['target'], CFG_Y_DF)
 
     def test_registration_sorting(self):
         perm = np.array([3, 1, 2, 0, 4, 5, 6, 7])
@@ -45,11 +53,11 @@ class TestTSConfig:
         uns_target_df = pd.DataFrame({TS_VAR: dates, 'y': y})
 
         cfg = TSConfig()
-        cfg.register_dataset(uns_train_df, 'x', 'predictor')
-        cfg.register_dataset(uns_target_df, 'y', 'target')
+        cfg.register_dataset(uns_train_df, 'predictor', 'Timestamp', 'x')
+        cfg.register_target(uns_target_df, 'Timestamp', 'y')
 
-        pd.testing.assert_frame_equal(cfg.datasets['x'], CFG_X_DF)
-        pd.testing.assert_frame_equal(cfg.datasets['y'], CFG_Y_DF)
+        pd.testing.assert_frame_equal(cfg.datasets['predictor'], CFG_X_DF)
+        pd.testing.assert_frame_equal(cfg.datasets['target'], CFG_Y_DF)
 
     def test_add_ar(self):
         X_lag2 = np.array([np.nan, np.nan, 2, 3, 4, 4, 5, 4, 3, 1])
@@ -58,12 +66,12 @@ class TestTSConfig:
         AR_DF.index.rename(TS_VAR, inplace=True)
 
         cfg = TSConfig()
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
+        cfg.register_dataset(TRAIN_DF, 'predictor', 'Timestamp', 'x')
+        cfg.register_target(TARGET_DF, 'Timestamp', 'y')
 
-        cfg.add_AR([2], dataset='x', var_names=['x'])
+        cfg.add_AR([2], dataset='predictor', var_names=['x'])
 
-        pd.testing.assert_frame_equal(cfg.datasets['AR_x'], AR_DF)
+        pd.testing.assert_frame_equal(cfg.datasets['AR_predictor'], AR_DF)
         assert cfg.ar_set
 
     def test_set_delay(self):
@@ -73,11 +81,11 @@ class TestTSConfig:
         DELAY_DF.index.rename(TS_VAR, inplace=True)
 
         cfg = TSConfig()
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
+        cfg.register_dataset(TRAIN_DF, 'predictor', 'Timestamp', 'x')
+        cfg.register_target(TARGET_DF, 'Timestamp', 'y')
 
         cfg.set_delay(periods=2)
-        pd.testing.assert_frame_equal(cfg.datasets['x'], DELAY_DF)
+        pd.testing.assert_frame_equal(cfg.datasets['predictor'], DELAY_DF)
 
     def test_stack(self):
         X_new = np.array([2, 3, 4, 4, 5, 4, 3, 1, np.nan])
@@ -88,10 +96,10 @@ class TestTSConfig:
         STACK_DF.index.rename(TS_VAR, inplace=True)
 
         cfg = TSConfig()
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
+        cfg.register_dataset(TRAIN_DF, 'predictor', 'Timestamp', 'x')
+        cfg.register_target(TARGET_DF, 'Timestamp', 'y')
 
-        cfg.add_AR([1], dataset='y', var_names=['y'])
+        cfg.add_AR([1], dataset='target', var_names=['y'])
         cfg.stack()
 
         pd.testing.assert_frame_equal(cfg.data[0], STACK_DF)

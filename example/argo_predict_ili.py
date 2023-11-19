@@ -1,5 +1,9 @@
 """ Example: Nowcast weekly flu incidence in the state of Massachusetts """
 
+# use the following line if running from this directory without
+# installing the package
+# import sys; sys.path.append('../')
+
 from pathlib import Path
 
 import pandas as pd
@@ -16,9 +20,9 @@ gt = gt_loader('./GTdata_MA.csv')
 
 # configure data with 52 ILI lag terms
 dc = TSConfig()
-dc.register_dataset(ili, name='ILI', type='target')
-dc.register_dataset(gt, name='Trends', type='predictor')
-dc.add_AR(range(1, 53), dataset='ILI', var_names=['%ILI'])
+dc.register_target(ili, time_var='Timestamp', target_var='%ILI')
+dc.register_dataset(gt, name='Trends', time_var='Timestamp')
+dc.add_AR(range(1, 53), dataset='target', var_names=['%ILI'])
 dc.stack()
 
 # use the standard ARGO model

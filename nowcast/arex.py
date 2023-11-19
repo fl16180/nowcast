@@ -32,8 +32,8 @@ class Arex(object):
         Suppose we continue the example with ``TSConfig``::
 
             $ dc = TSConfig()
-            $ dc.register_dataset(cdc, 'CDC', 'target')
-            $ dc.register_dataset(external, 'pred', 'predictor')
+            $ dc.register_target(cdc, 'Date', 'CDC')
+            $ dc.register_dataset(external, 'pred', 'Date', 'predictor')
             $ dc.add_AR(range(1, 7), dataset='CDC', var_names='%ILI')
             $ dc.stack()
 
@@ -57,6 +57,10 @@ class Arex(object):
 
         Note that the timestamps for pred_start and pred_end refer to the time
         of making the prediction, not the time that is predicted.
+        
+        The returned prediction dataframe will include a column called
+        "Timestamp", which is the time of making the prediction, and a column
+        called "Event Time", which is the time of the predicted event.
 
     Args:
         model (class): Any model with ``fit`` and ``predict`` methods following
@@ -92,9 +96,12 @@ class Arex(object):
 
         if self.config:
             self.X, self.y = self.config.data
+            self.period = self.config.period
+        else:
+            self.period = TSConfig._compute_period(self.y)
 
         if self.verbose > 0:
-            print('---------------- ArEx model initialized ----------------')
+            print('---------------- AREX model initialized ----------------')
 
     def forecast(self, t_plus, pred_start, pred_end,
                 training, window, pred_name='Predicted', t_known=False):
@@ -138,9 +145,13 @@ class Arex(object):
 
         # range of timestamps to predict
         pred_range = self.X.loc[self.pred_start:self.pred_end].index
+        event_range = pred_range + self.period * self.t_plus
 
         predictions = []
-        for timestamp in tqdm(pred_range):
+        for i in tqdm(range(len(pred_range))):
+            timestamp = pred_range[i]
+            time_event = event_range[i]
+
             X_train_start, X_train_end, y_train_start, y_train_end = \
                 self._get_start_end_index(timestamp)
 
@@ -151,7 +162,8 @@ class Arex(object):
             X_pred = self.X.iloc[X_pred_index:X_pred_index + 1]
 
             if self.verbose == 2:
-                print('Predicting time: ', timestamp)
+                print('Time prediction made: ', timestamp)
+                print('Time of event: ', time_event)
                 print('X_train: ', X_train.index[0], X_train.index[-1])
                 print('y_train: ', y_train.index[0], y_train.index[-1])
                 print('X_pred: ', X_pred.index[0])
@@ -168,7 +180,8 @@ class Arex(object):
             self.model.fit(X_train, y_train)
             predictions.append(self.model.predict(X_pred)[0])
 
-        pred_df = pd.DataFrame(data={self.pred_name: predictions},
+        pred_df = pd.DataFrame(data={'Event Time': event_range,
+                                     self.pred_name: predictions},
                                index=pred_range).reset_index()
         return pred_df
 
@@ -229,7 +242,7 @@ class Arex(object):
         assert self.pred_end in self.X.index, 'pred_end not in X dataframe'
 
     def _get_start_idx(self, pred_timestamp):
-        # forecasting shifts train set back
+        # forecasting shifts train set back, determine the correct amount
         backshift = self.t_plus - int(self.t_known)
 
         if pred_timestamp in self.y.index:

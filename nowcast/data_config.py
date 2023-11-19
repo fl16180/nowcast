@@ -34,8 +34,8 @@ class TSConfig(object):
         data::
 
             $ dc = TSConfig()
-            $ dc.register_dataset(cdc, 'CDC', 'target')
-            $ dc.register_dataset(external, 'pred', 'predictor')
+            $ dc.register_target(cdc, 'Date', 'CDC')
+            $ dc.register_dataset(external, 'pred', 'Date', 'predictor')
 
         Add lag terms of the target variable as autoregressive predictors::
 
@@ -52,22 +52,59 @@ class TSConfig(object):
     """
     def __init__(self):
         self.datasets = {}
-        self.target = None
         self.predictors = []
         self.prepared_data = None
         self.forecast_delay = 0
         self.ar_set = False
+        self.period = None
 
-    def register_dataset(self, data, name, type, var_names=None, copy=True):
-        """ Register a dataset with the TSConfig.
-
+    def register_target(self, data, time_var, target_var=None, copy=True):
+        """ Register a target variable with the TSConfig.
+        
         Args:
             data (pd.DataFrame): Must contain at least 2 columns, a timestamp
-                column (called 'Timestamp'), and a variable column.
+                column, and a variable column.
+                
+            time_var (str): Name of the timestamp column (will be renamed
+                to Timestamp)
+
+            target_var (str): Name of the target variable column
+                (if None, is inferred)
+                
+            copy (bool): Make a copy of data before modifying. If set to false,
+                the original dataframe will be altered (only recommend
+                when memory is a constraint)
+        """
+        if copy:
+            data = data.copy()
+        if time_var != TS_VAR:
+            data.rename(columns={time_var: TS_VAR}, inplace=True)
+        data[TS_VAR] = pd.to_datetime(data[TS_VAR])
+        data.sort_values(by=TS_VAR, inplace=True)
+        data.set_index(TS_VAR, inplace=True)
+
+        if target_var:
+            assert isinstance(target_var, str), \
+                'only a single target per dataset currently supported'
+        else:
+            assert data.shape[1] == 1, 'var_names must be specified for >1 col'
+            target_var = data.columns[data.columns != TS_VAR][0]
+
+        # select column as dataframe
+        data = data.loc[:, [target_var]]
+        self.datasets['target'] = data
+    
+    def register_dataset(self, data, name, time_var, var_names=None, copy=True):
+        """ Register a predictor dataset with the TSConfig.
+
+        Args:
+            data (pd.DataFrame): Must contain at least 2 columns: a timestamp
+                column, and a variable column.
 
             name (str): Name to associate with the dataset
 
-            type (str): 'target' or 'predictor'
+            time_var (str): Name of the timestamp column (will be renamed
+                to Timestamp)
 
             var_names (list): Optional, list of columns to keep
 
@@ -75,56 +112,48 @@ class TSConfig(object):
                 the original dataframe will be altered (only recommend
                 when memory is a constraint)
         """
+        if name == 'target':
+            raise ValueError("Use register_target method to register target data")
+        
         if copy:
             data = data.copy()
-        if type == 'target':
-            data = self._register_target(data, name, var_names)
-        elif type == 'predictor':
-            data = self._register_predictor(data, name, var_names)
-        else:
-            raise ValueError("type must be 'target' or 'predictor'")
-        self.datasets[name] = data
+        
+        if time_var != TS_VAR:
+            data.rename(columns={time_var: TS_VAR}, inplace=True)
 
-    def _register_target(self, data, name, var_names=None):
-        assert TS_VAR in data.columns, 'dataset missing date var'
         data[TS_VAR] = pd.to_datetime(data[TS_VAR])
         data.sort_values(by=TS_VAR, inplace=True)
         data.set_index(TS_VAR, inplace=True)
-
-        if var_names:
-            assert isinstance(var_names, str), \
-                'only a single target per dataset currently supported'
-        else:
-            assert data.shape[1] == 1, 'var_names must be specified for >1 col'
-            var_names = data.columns[data.columns != TS_VAR][0]
-
-        # select column as dataframe
-        data = data.loc[:, [var_names]]
-        self.target = name
-        return data
-
-    def _register_predictor(self, data, name, var_names=None):
-        assert TS_VAR in data.columns, 'dataset missing date var'
-        data[TS_VAR] = pd.to_datetime(data[TS_VAR])
-        data.sort_values(by=TS_VAR, inplace=True)
-        data.set_index(TS_VAR, inplace=True)
-
-        if not var_names:
+    
+        if var_names is None:
             var_names = data.columns[data.columns != TS_VAR].tolist()
-
+        
         # ensure var_names is a list for dataframe selection
         if isinstance(var_names, str):
             var_names = [var_names]
 
         data = data.loc[:, var_names]
+        self.datasets[name] = data
         self.predictors.append(name)
-        return data
+
+    @classmethod
+    def _compute_period(cls, df):
+        time_vec = df.index
+        tdiffs = time_vec[1:] - time_vec[:-1]
+        if len(tdiffs.unique()) > 1:
+            raise ValueError('Input time series has inconsistent period.')
+        period = tdiffs[0]
+        return period
 
     def _extend_date_range(self, df, n_periods):
         """ the standard pandas shift cuts off lags at the last timestamp, but
         we instead want to extend the time index to fully fit the lags. """
         # infer time between entries
-        tdelta = df.index.inferred_freq
+        # tdelta = df.index.inferred_freq
+        if self.period is None:
+            tdelta = self._compute_period(df)
+        else:
+            tdelta = self.period
         assert tdelta, 'Dataset has gaps or otherwise unable to infer freq'
 
         # add additional empty rows for extended data
@@ -201,7 +230,7 @@ class TSConfig(object):
 
         # if lag is for target, add forecasting delay to lag
         # other datasets already have delay applied.
-        if dataset == self.target:
+        if dataset == 'target':
             shift = max(terms) + self.forecast_delay
             terms = [x + self.forecast_delay for x in terms]
         else:
@@ -240,9 +269,11 @@ class TSConfig(object):
         self.prepared_data.sort_index(inplace=True)
         if fill_na != 'ignore':
             raise NotImplementedError
+        if self.period is None:
+            self.period = self._compute_period(self.datasets['target'])
 
     @property
     def data(self):
         if self.prepared_data is None:
             raise RuntimeError('Call stack method before returning data.')
-        return self.prepared_data, self.datasets[self.target]
+        return self.prepared_data, self.datasets['target']
