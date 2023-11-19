@@ -37,8 +37,8 @@ mm = MockModel()
 class TestArexNowcast:
     def test_simple_nowcast(self):
         cfg = TSConfig()
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
+        cfg.register_target(TARGET_DF, 'Timestamp')
+        cfg.register_dataset(TRAIN_DF, 'x', 'Timestamp')
         cfg.stack()
 
         arex = Arex(model=mm, data_config=cfg)
@@ -58,8 +58,8 @@ class TestArexNowcast:
 
     def test_delay_nowcast(self):
         cfg = TSConfig()
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
+        cfg.register_target(TARGET_DF, 'Timestamp')
+        cfg.register_dataset(TRAIN_DF, 'x', 'Timestamp')
         cfg.set_delay(1, datasets=['x'])
         cfg.stack()
 
@@ -80,8 +80,8 @@ class TestArexNowcast:
 
     def test_ar_nowcast(self):
         cfg = TSConfig()
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
+        cfg.register_target(TARGET_DF, 'Timestamp')
+        cfg.register_dataset(TRAIN_DF, 'x', 'Timestamp')
         cfg.add_AR([2], dataset='x')
         cfg.stack()
 
@@ -118,8 +118,8 @@ class TestArexNowcast:
 
     def test_window_too_big(self):
         cfg = TSConfig()
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
+        cfg.register_target(TARGET_DF, 'Timestamp')
+        cfg.register_dataset(TRAIN_DF, 'x', 'Timestamp')
         cfg.add_AR([2], dataset='x')
         cfg.stack()
 
@@ -139,8 +139,8 @@ class TestArexForecast:
 
     def test_simple_forecast_one(self):
         cfg = TSConfig()
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
+        cfg.register_target(TARGET_DF, 'Timestamp')
+        cfg.register_dataset(TRAIN_DF, 'x', 'Timestamp')
         cfg.stack()
 
         arex = Arex(model=mm, data_config=cfg)
@@ -160,8 +160,8 @@ class TestArexForecast:
 
     def test_simple_forecast_two(self):
         cfg = TSConfig()
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
+        cfg.register_target(TARGET_DF, 'Timestamp')
+        cfg.register_dataset(TRAIN_DF, 'x', 'Timestamp')
         cfg.stack()
 
         arex = Arex(model=mm, data_config=cfg)
@@ -181,8 +181,8 @@ class TestArexForecast:
 
     def test_t_known_forecast(self):
         cfg = TSConfig()
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
+        cfg.register_target(TARGET_DF, 'Timestamp')
+        cfg.register_dataset(TRAIN_DF, 'x', 'Timestamp')
         cfg.stack()
 
         arex = Arex(model=mm, data_config=cfg)
@@ -202,8 +202,8 @@ class TestArexForecast:
 
     def test_expand_forecast(self):
         cfg = TSConfig()
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
+        cfg.register_target(TARGET_DF, 'Timestamp')
+        cfg.register_dataset(TRAIN_DF, 'x', 'Timestamp')
         cfg.stack()
 
         arex = Arex(model=mm, data_config=cfg)
@@ -231,8 +231,8 @@ class TestArexForecast:
 
     def test_t_known_expand_forecast(self):
         cfg = TSConfig()
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
+        cfg.register_target(TARGET_DF, 'Timestamp')
+        cfg.register_dataset(TRAIN_DF, 'x', 'Timestamp')
         cfg.stack()
 
         arex = Arex(model=mm, data_config=cfg)
@@ -261,8 +261,8 @@ class TestArexForecast:
     def test_ar_forecast(self):
         """ using AR to extend X to be longer than Y so must train earlier """
         cfg = TSConfig()
-        cfg.register_dataset(TARGET_DF, 'y', 'target')
-        cfg.register_dataset(TRAIN_DF, 'x', 'predictor')
+        cfg.register_target(TARGET_DF, 'Timestamp')
+        cfg.register_dataset(TRAIN_DF, 'x', 'Timestamp')
         cfg.add_AR([2], dataset='x')
         cfg.stack()
 
