@@ -19,7 +19,10 @@ def MAE(targets, predictions):
     """ mean absolute error """
     return np.absolute(targets - predictions).mean()
 
-
 def MAPE(targets, predictions):
     """ mean absolute percent error """
     return np.mean(np.abs((targets - predictions) / targets))
+
+def NMAE(targets, predictions):
+    """ normalized mean absolute error """
+    return np.mean(np.abs(targets - predictions)) / np.mean(np.abs(targets))
