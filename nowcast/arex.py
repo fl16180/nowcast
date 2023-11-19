@@ -58,10 +58,9 @@ class Arex(object):
         Note that the timestamps for pred_start and pred_end refer to the time
         of making the prediction, not the time that is predicted.
         
-        The returned prediction dataframe will contain a column called
-        "Timestamp", which is the time of making the prediction, a column
-        called "Event Time", which is the time of the predicted event, and
-        the predicted column entitled "Predicted".
+        The returned prediction dataframe will include a column called
+        "Timestamp", which is the time of making the prediction, and a column
+        called "Event Time", which is the time of the predicted event.
 
     Args:
         model (class): Any model with ``fit`` and ``predict`` methods following
